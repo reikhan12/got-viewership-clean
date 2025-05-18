@@ -1,0 +1,72 @@
+---
+title: "Game of Thrones Viewership Report"
+author: "Reikhan Gurbanova"
+format: html
+editor: visual
+---
+
+# *Game of Thrones*
+
+**Game of Thrones** is an *American fantasy drama television series* that aired on HBO from 2011 to 2019. Based on George R. R. Martin's *A Song of Ice and Fire*, the show quickly became a cultural phenomenon.
+
+![Game of Thrones](https://upload.wikimedia.org/wikipedia/en/d/d8/Game_of_Thrones_title_card.jpg)
+
+## Viewership Dataset
+
+We use publicly available data from [Wikipedia](https://en.wikipedia.org/wiki/List_of_Game_of_Thrones_episodes) that contains episode-level viewership in millions.
+
+```{r}
+#| warning: false
+library(readr)
+library(dplyr)
+library(ggplot2)
+
+got <- read_csv("got_viewership.csv")
+head(got)
+```
+
+## Basic Statistics
+
+```{r}
+got %>%
+  summarise(
+    mean_viewers = mean(Viewers_Million),
+    max_viewers = max(Viewers_Million),
+    min_viewers = min(Viewers_Million)
+  )
+```
+
+## Viewership Over Time
+
+```{r}
+ggplot(got, aes(x = Episode, y = Viewers_Million, group = Season, color = as.factor(Season))) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Game of Thrones Viewership by Episode",
+       x = "Episode Number",
+       y = "Viewers (Millions)",
+       color = "Season")
+```
+
+## Season-to-Season Viewership
+
+```{r}
+season_avg <- got %>%
+  group_by(Season) %>%
+  summarise(Average_Views = mean(Viewers_Million))
+
+ggplot(season_avg, aes(x = factor(Season), y = Average_Views, fill = factor(Season))) +
+  geom_col(show.legend = FALSE) +
+  labs(title = "Average Viewership by Season",
+       x = "Season",
+       y = "Average Viewers (Millions)")
+```
+
+## Observations
+
+Between season 1 and season 8, the viewership increased significantly from an average of approximately 2.5 million to over 12 million. However, some fluctuation is seen in season 5 and season 6, before peaking in season 8.
+
+## References
+
+-   James, Gareth, et al. *An Introduction to Statistical Learning*. Springer, 2013.
+-   [Wikipedia Viewership Source](https://en.wikipedia.org/wiki/List_of_Game_of_Thrones_episodes)
